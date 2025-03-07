@@ -1,0 +1,35 @@
+datasource db {
+  provider = "mysql"
+  url      = "mysql://root:passwordroot@localhost:3306/db"
+}
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "./generated/prisma-client-js"
+}
+
+model Author {
+  authorId Int      @id @default(autoincrement()) @map("author_id")
+  name     String
+  createAt DateTime @default(now()) @map("create_at")
+  updateAt DateTime @updatedAt @map("update_at")
+  books    Book[]
+}
+
+enum BookType {
+  A
+  B
+  C
+  D
+}
+
+model Book {
+  bookId   Int      @id @default(autoincrement()) @map("book_id")
+  name     String
+  type     BookType
+  createAt DateTime @default(now()) @map("create_at")
+  updateAt DateTime @updatedAt @map("update_at")
+  count    Int      @default(0)
+  authorId Int      @map("author_id")
+  author   Author   @relation(fields: [authorId], references: [authorId])
+}
