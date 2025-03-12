@@ -9,6 +9,7 @@ export class BookController {
 
   @Post()
   createBook(@Body() body: ICreateBook) {
+    
     return this.bookService.createBook(body);
   }
 

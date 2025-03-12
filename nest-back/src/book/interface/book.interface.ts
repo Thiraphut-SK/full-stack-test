@@ -5,4 +5,6 @@ export interface ICreateBook {
     type: 'A' | 'B' | 'C' | 'D';
     authorId: number;
     count?: number;
+    typeName?: string;
+    publishers?: string;
   }

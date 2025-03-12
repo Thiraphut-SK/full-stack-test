@@ -3,6 +3,7 @@
 import { Box, Button, TextField } from "@mui/material";
 import axios from "axios";
 import Image from "next/image";
+import Link from "next/link";
 import { useEffect, useState } from "react";
 
 interface Author {
@@ -14,6 +15,7 @@ interface Author {
 
 export default function Home() {
   const [dataAuthor, setDataAuthor] = useState<Author[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
 
   const [formData, setFormData] = useState<string>("");
 
@@ -21,22 +23,32 @@ export default function Home() {
     axios
       .get(`${process.env.NEXT_PUBLIC_API_PATH}/author`) // Call the API route that interacts with Prisma
       .then((response) => {
+        setLoading(true);
         console.log(response.data);
         setDataAuthor(response.data);
+        setLoading(false);
       });
-  }, []);
+  }, [loading]);
 
   const addAuthor = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    axios.post(`${process.env.NEXT_PUBLIC_API_PATH}/author`, { name: formData }); // Call the API route that interacts with Prisma
-    alert("success");
+    axios
+      .post(`${process.env.NEXT_PUBLIC_API_PATH}/author`, {
+        name: formData,
+      })
+      .then(() => {
+        setLoading(true);
+        alert("success");
+      }); // Call the API route that interacts with Prisma
   };
 
   const deleteAuthor = async (authorId: number) => {
-    
     try {
-      const response = await axios.delete(`${process.env.NEXT_PUBLIC_API_PATH}/author/${authorId}`); // if use params not search param for production
+      const response = await axios.delete(
+        `${process.env.NEXT_PUBLIC_API_PATH}/author/${authorId}`
+      ); // if use params not search param for production
       console.log("Author deleted:", response.data);
+      setLoading(true);
     } catch (error) {
       console.error("Error deleting author:", error);
     }
@@ -99,6 +111,9 @@ export default function Home() {
             <Button type="submit">add</Button>
           </Box>
         </div>
+        <Link href="pages/books">
+          <Button className="text-blue-400">Books Page</Button>
+        </Link>
       </main>
     </div>
   );

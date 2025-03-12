@@ -96,3 +96,15 @@ Nest is an MIT-licensed open source project. It can grow thanks to the sponsors 
 ## License
 
 Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+
+-nest --help // ดูคำสั่งของตัว cli
+
+## Generate a new module and service:
+-nest generate <schematic> <name>
+--nest g controller [name]
+
+## Prisma migate 
+-npx prisma migrate
+
+## Prisma generate client
+-npx prisma generate

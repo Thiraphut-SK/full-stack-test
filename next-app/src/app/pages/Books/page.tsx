@@ -26,6 +26,9 @@ interface Books {
   type: string;
   count: number;
   authorId: number;
+  typeName: string;
+  publishers: string;
+  author: Author;
   createAt: string;
   updateAt: string;
 }
@@ -39,6 +42,7 @@ export default function Books() {
     authorId: "",
     type: "",
     count: 0,
+    publishers:""
   });
 
   const submitBook = (e: React.FormEvent<HTMLFormElement>) => {
@@ -49,6 +53,7 @@ export default function Books() {
         authorId: formData.authorId,
         type: formData.type,
         count: formData.count,
+        publishers: formData.publishers,
       }) // Call the API route that interacts with Prisma
 
       .then((response) => {
@@ -103,100 +108,114 @@ export default function Books() {
   }, [loading]);
 
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-start justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)] bg-gray-100 text-black">
-      <Typography variant="h4">Book</Typography>
-      <Box
-        component="form"
-        sx={{
-          "& .MuiTextField-root": { m: 1, width: "25ch" },
-          flexDirection: "column",
-          display: "flex",
-        }}
-        noValidate
-        onSubmit={submitBook}
-      >
-        <TextField
-          id="name"
-          label="Name"
-          variant="outlined"
-          placeholder="Name Book"
-          value={formData.name}
-          onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-          color="info"
-        />
-        <FormControl sx={{ m: 1, minWidth: 80 }}>
-          <InputLabel id="demo-simple-select-autowidth-label">Type</InputLabel>
-          <Select
-            labelId="demo-simple-select-label"
-            id="demo-simple-select"
-            value={formData.type}
-            label="Type"
-            onChange={handleChange}
-          >
-            <MenuItem value={"A"}>A</MenuItem>
-            <MenuItem value={"B"}>B</MenuItem>
-            <MenuItem value={"C"}>C</MenuItem>
-          </Select>
-        </FormControl>
-        <FormControl sx={{ m: 1, minWidth: 80 }}>
-          <InputLabel id="demo-simple-select-autowidth-label">
-            Author Write
-          </InputLabel>
-          <Select
-            labelId="demo-simple-select-label"
-            id="demo-simple-select"
-            value={formData.authorId}
-            label="Author Write"
-            onChange={handleChangeAuthor}
-          >
-            {dataAuthor.map((item) => {
-              return (
-                <MenuItem key={item.authorId} value={item.authorId}>
-                  {item.name}
-                </MenuItem>
-              );
-            })}
-          </Select>
-        </FormControl>
-        <TextField
-          id="count"
-          type="number"
-          label="Count"
-          variant="outlined"
-          placeholder="จำนวนหนังสือ"
-          value={formData.count}
-          onChange={(e) =>
-            setFormData({ ...formData, count: Number(e.target.value) })
-          }
-          color="info"
-        />
-        <Button type="submit">Add Book</Button>
-      </Box>
-
-      <Box>
-        <Typography>Book list</Typography>
-        {dataBook.map((item) => {
-          return (
-            <div
-              key={item.bookId}
-              className="text-red-400 flex gap-4 items-center"
+    <div className="flex flex-col items-start justify-items-center min-h-screen  pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)] bg-gray-100 text-black">
+      <Typography variant="h4" sx={{display:'flex', mx:'auto'}}>Book</Typography>
+      <Box sx={{ display: "flex", justifyContent: "space-around", width: "100%" }}>
+        <Box
+          component="form"
+          sx={{
+            "& .MuiTextField-root": { m: 1, width: "25ch" },
+            flexDirection: "column",
+            display: "flex",
+          }}
+          noValidate
+          onSubmit={submitBook}
+        >
+          <TextField
+            id="name"
+            label="Name"
+            variant="outlined"
+            placeholder="Name Book"
+            value={formData.name}
+            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+            color="info"
+          />
+          <FormControl sx={{ m: 1, minWidth: 80 }}>
+            <InputLabel id="demo-simple-select-autowidth-label">
+              Type
+            </InputLabel>
+            <Select
+              labelId="demo-simple-select-label"
+              id="demo-simple-select"
+              value={formData.type}
+              label="Type"
+              onChange={handleChange}
             >
-              <div>
-                -{item.name} ประเภท {item.type} คนแต่ง {item.authorId}{" "}
-                จำนวนหนังสือ {item.count}
-              </div>
-              <Button
-                onClick={() => deleteBook(item.bookId)}
-                variant="contained"
-                color="error"
-                size="small"
-                sx={{ my: 1 }}
+              <MenuItem value={"A"}>A</MenuItem>
+              <MenuItem value={"B"}>B</MenuItem>
+              <MenuItem value={"C"}>C</MenuItem>
+            </Select>
+          </FormControl>
+          <FormControl sx={{ m: 1, minWidth: 80 }}>
+            <InputLabel id="demo-simple-select-autowidth-label">
+              Author Write
+            </InputLabel>
+            <Select
+              labelId="demo-simple-select-label"
+              id="demo-simple-select"
+              value={formData.authorId}
+              label="Author Write"
+              onChange={handleChangeAuthor}
+            >
+              {dataAuthor.map((item) => {
+                return (
+                  <MenuItem key={item.authorId} value={item.authorId}>
+                    {item.name}
+                  </MenuItem>
+                );
+              })}
+            </Select>
+          </FormControl>
+          <TextField
+            id="publishers"
+            label="Publishers"
+            variant="outlined"
+            placeholder="Name publishers"
+            value={formData.publishers}
+            onChange={(e) => setFormData({ ...formData, publishers: e.target.value })}
+            color="info"
+          />
+          <TextField
+            id="count"
+            type="number"
+            label="Count"
+            variant="outlined"
+            placeholder="จำนวนหนังสือ"
+            value={formData.count}
+            onChange={(e) =>
+              setFormData({ ...formData, count: Number(e.target.value) })
+            }
+            color="info"
+          />
+          <Button type="submit">Add Book</Button>
+        </Box>
+
+        <Box>
+          <Typography>Book list</Typography>
+          {dataBook.map((item) => {
+            return (
+              <div
+                key={item.bookId}
+                className="text-red-400 flex gap-4 items-center"
               >
-                Delete
-              </Button>
-            </div>
-          );
-        })}
+                <div>
+                  * {item.typeName} คนแต่ง {item.author.name} {`${
+                    item.publishers ? `สำนักพิมพ์ ${item.publishers}` : ""} `}
+                  จำนวนหนังสือ {item.count}
+                </div>
+                <Button
+                  onClick={() => deleteBook(item.bookId)}
+                  variant="contained"
+                  color="error"
+                  size="small"
+                  sx={{ my: 1 }}
+                >
+                  Delete
+                </Button>
+              </div>
+            );
+          })}
+        </Box>
       </Box>
     </div>
   );

@@ -24,12 +24,13 @@ enum BookType {
 }
 
 model Book {
-  bookId   Int      @id @default(autoincrement()) @map("book_id")
-  name     String
-  type     BookType
-  createAt DateTime @default(now()) @map("create_at")
-  updateAt DateTime @updatedAt @map("update_at")
-  count    Int      @default(0)
-  authorId Int      @map("author_id")
-  author   Author   @relation(fields: [authorId], references: [authorId])
+  bookId     Int      @id @default(autoincrement()) @map("book_id")
+  name       String
+  type       BookType
+  publishers String?
+  createAt   DateTime @default(now()) @map("create_at")
+  updateAt   DateTime @updatedAt @map("update_at")
+  count      Int      @default(0)
+  authorId   Int      @map("author_id")
+  author     Author   @relation(fields: [authorId], references: [authorId])
 }

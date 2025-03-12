@@ -80,7 +80,7 @@ export class PrismaClient<
    */
 
   constructor(optionsArg ?: Prisma.Subset<ClientOptions, Prisma.PrismaClientOptions>);
-  $on<V extends U>(eventType: V, callback: (event: V extends 'query' ? Prisma.QueryEvent : Prisma.LogEvent) => void): void;
+  $on<V extends U>(eventType: V, callback: (event: V extends 'query' ? Prisma.QueryEvent : Prisma.LogEvent) => void): PrismaClient;
 
   /**
    * Connect with the database
@@ -164,9 +164,9 @@ export class PrismaClient<
   $transaction<R>(fn: (prisma: Omit<PrismaClient, runtime.ITXClientDenyList>) => $Utils.JsPromise<R>, options?: { maxWait?: number, timeout?: number, isolationLevel?: Prisma.TransactionIsolationLevel }): $Utils.JsPromise<R>
 
 
-  $extends: $Extensions.ExtendsHook<"extends", Prisma.TypeMapCb, ExtArgs, $Utils.Call<Prisma.TypeMapCb, {
+  $extends: $Extensions.ExtendsHook<"extends", Prisma.TypeMapCb<ClientOptions>, ExtArgs, $Utils.Call<Prisma.TypeMapCb<ClientOptions>, {
     extArgs: ExtArgs
-  }>, ClientOptions>
+  }>>
 
       /**
    * `prisma.author`: Exposes CRUD operations for the **Author** model.
@@ -245,8 +245,8 @@ export namespace Prisma {
   export import Exact = $Public.Exact
 
   /**
-   * Prisma Client JS version: 6.4.1
-   * Query Engine version: a9055b89e58b4b5bfb59600785423b1db3d0e75d
+   * Prisma Client JS version: 6.5.0
+   * Query Engine version: 173f8d54f8d52e692c7e27e72a88314ec7aeff60
    */
   export type PrismaVersion = {
     client: string
@@ -513,7 +513,7 @@ export namespace Prisma {
   type AtLeast<O extends object, K extends string> = NoExpand<
     O extends unknown
     ? | (K extends keyof O ? { [P in K]: O[P] } & O : O)
-      | {[P in keyof O as P extends K ? K : never]-?: O[P]} & O
+      | {[P in keyof O as P extends K ? P : never]-?: O[P]} & O
     : never>;
 
   type _Strict<U, _U = U> = U extends unknown ? U & OptionalFlat<_Record<Exclude<Keys<_U>, keyof U>, never>> : never;
@@ -638,11 +638,14 @@ export namespace Prisma {
     db?: Datasource
   }
 
-  interface TypeMapCb extends $Utils.Fn<{extArgs: $Extensions.InternalArgs, clientOptions: PrismaClientOptions }, $Utils.Record<string, any>> {
-    returns: Prisma.TypeMap<this['params']['extArgs'], this['params']['clientOptions']>
+  interface TypeMapCb<ClientOptions = {}> extends $Utils.Fn<{extArgs: $Extensions.InternalArgs }, $Utils.Record<string, any>> {
+    returns: Prisma.TypeMap<this['params']['extArgs'], ClientOptions extends { omit: infer OmitOptions } ? OmitOptions : {}>
   }
 
-  export type TypeMap<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, ClientOptions = {}> = {
+  export type TypeMap<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> = {
+    globalOmitOptions: {
+      omit: GlobalOmitOptions
+    }
     meta: {
       modelProps: "author" | "book"
       txIsolationLevel: Prisma.TransactionIsolationLevel
@@ -1220,7 +1223,7 @@ export namespace Prisma {
       select?: AuthorCountAggregateInputType | true
     }
 
-  export interface AuthorDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, ClientOptions = {}> {
+  export interface AuthorDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
     [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['Author'], meta: { name: 'Author' } }
     /**
      * Find zero or one Author that matches the filter.
@@ -1233,7 +1236,7 @@ export namespace Prisma {
      *   }
      * })
      */
-    findUnique<T extends AuthorFindUniqueArgs>(args: SelectSubset<T, AuthorFindUniqueArgs<ExtArgs>>): Prisma__AuthorClient<$Result.GetResult<Prisma.$AuthorPayload<ExtArgs>, T, "findUnique", ClientOptions> | null, null, ExtArgs, ClientOptions>
+    findUnique<T extends AuthorFindUniqueArgs>(args: SelectSubset<T, AuthorFindUniqueArgs<ExtArgs>>): Prisma__AuthorClient<$Result.GetResult<Prisma.$AuthorPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
 
     /**
      * Find one Author that matches the filter or throw an error with `error.code='P2025'`
@@ -1247,7 +1250,7 @@ export namespace Prisma {
      *   }
      * })
      */
-    findUniqueOrThrow<T extends AuthorFindUniqueOrThrowArgs>(args: SelectSubset<T, AuthorFindUniqueOrThrowArgs<ExtArgs>>): Prisma__AuthorClient<$Result.GetResult<Prisma.$AuthorPayload<ExtArgs>, T, "findUniqueOrThrow", ClientOptions>, never, ExtArgs, ClientOptions>
+    findUniqueOrThrow<T extends AuthorFindUniqueOrThrowArgs>(args: SelectSubset<T, AuthorFindUniqueOrThrowArgs<ExtArgs>>): Prisma__AuthorClient<$Result.GetResult<Prisma.$AuthorPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
     /**
      * Find the first Author that matches the filter.
@@ -1262,7 +1265,7 @@ export namespace Prisma {
      *   }
      * })
      */
-    findFirst<T extends AuthorFindFirstArgs>(args?: SelectSubset<T, AuthorFindFirstArgs<ExtArgs>>): Prisma__AuthorClient<$Result.GetResult<Prisma.$AuthorPayload<ExtArgs>, T, "findFirst", ClientOptions> | null, null, ExtArgs, ClientOptions>
+    findFirst<T extends AuthorFindFirstArgs>(args?: SelectSubset<T, AuthorFindFirstArgs<ExtArgs>>): Prisma__AuthorClient<$Result.GetResult<Prisma.$AuthorPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
 
     /**
      * Find the first Author that matches the filter or
@@ -1278,7 +1281,7 @@ export namespace Prisma {
      *   }
      * })
      */
-    findFirstOrThrow<T extends AuthorFindFirstOrThrowArgs>(args?: SelectSubset<T, AuthorFindFirstOrThrowArgs<ExtArgs>>): Prisma__AuthorClient<$Result.GetResult<Prisma.$AuthorPayload<ExtArgs>, T, "findFirstOrThrow", ClientOptions>, never, ExtArgs, ClientOptions>
+    findFirstOrThrow<T extends AuthorFindFirstOrThrowArgs>(args?: SelectSubset<T, AuthorFindFirstOrThrowArgs<ExtArgs>>): Prisma__AuthorClient<$Result.GetResult<Prisma.$AuthorPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
     /**
      * Find zero or more Authors that matches the filter.
@@ -1296,7 +1299,7 @@ export namespace Prisma {
      * const authorWithAuthorIdOnly = await prisma.author.findMany({ select: { authorId: true } })
      * 
      */
-    findMany<T extends AuthorFindManyArgs>(args?: SelectSubset<T, AuthorFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AuthorPayload<ExtArgs>, T, "findMany", ClientOptions>>
+    findMany<T extends AuthorFindManyArgs>(args?: SelectSubset<T, AuthorFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AuthorPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
 
     /**
      * Create a Author.
@@ -1310,7 +1313,7 @@ export namespace Prisma {
      * })
      * 
      */
-    create<T extends AuthorCreateArgs>(args: SelectSubset<T, AuthorCreateArgs<ExtArgs>>): Prisma__AuthorClient<$Result.GetResult<Prisma.$AuthorPayload<ExtArgs>, T, "create", ClientOptions>, never, ExtArgs, ClientOptions>
+    create<T extends AuthorCreateArgs>(args: SelectSubset<T, AuthorCreateArgs<ExtArgs>>): Prisma__AuthorClient<$Result.GetResult<Prisma.$AuthorPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
     /**
      * Create many Authors.
@@ -1338,7 +1341,7 @@ export namespace Prisma {
      * })
      * 
      */
-    delete<T extends AuthorDeleteArgs>(args: SelectSubset<T, AuthorDeleteArgs<ExtArgs>>): Prisma__AuthorClient<$Result.GetResult<Prisma.$AuthorPayload<ExtArgs>, T, "delete", ClientOptions>, never, ExtArgs, ClientOptions>
+    delete<T extends AuthorDeleteArgs>(args: SelectSubset<T, AuthorDeleteArgs<ExtArgs>>): Prisma__AuthorClient<$Result.GetResult<Prisma.$AuthorPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
     /**
      * Update one Author.
@@ -1355,7 +1358,7 @@ export namespace Prisma {
      * })
      * 
      */
-    update<T extends AuthorUpdateArgs>(args: SelectSubset<T, AuthorUpdateArgs<ExtArgs>>): Prisma__AuthorClient<$Result.GetResult<Prisma.$AuthorPayload<ExtArgs>, T, "update", ClientOptions>, never, ExtArgs, ClientOptions>
+    update<T extends AuthorUpdateArgs>(args: SelectSubset<T, AuthorUpdateArgs<ExtArgs>>): Prisma__AuthorClient<$Result.GetResult<Prisma.$AuthorPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
     /**
      * Delete zero or more Authors.
@@ -1407,7 +1410,7 @@ export namespace Prisma {
      *   }
      * })
      */
-    upsert<T extends AuthorUpsertArgs>(args: SelectSubset<T, AuthorUpsertArgs<ExtArgs>>): Prisma__AuthorClient<$Result.GetResult<Prisma.$AuthorPayload<ExtArgs>, T, "upsert", ClientOptions>, never, ExtArgs, ClientOptions>
+    upsert<T extends AuthorUpsertArgs>(args: SelectSubset<T, AuthorUpsertArgs<ExtArgs>>): Prisma__AuthorClient<$Result.GetResult<Prisma.$AuthorPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
 
     /**
@@ -1547,9 +1550,9 @@ export namespace Prisma {
    * Because we want to prevent naming conflicts as mentioned in
    * https://github.com/prisma/prisma-client-js/issues/707
    */
-  export interface Prisma__AuthorClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, ClientOptions = {}> extends Prisma.PrismaPromise<T> {
+  export interface Prisma__AuthorClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
-    books<T extends Author$booksArgs<ExtArgs> = {}>(args?: Subset<T, Author$booksArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$BookPayload<ExtArgs>, T, "findMany", ClientOptions> | Null>
+    books<T extends Author$booksArgs<ExtArgs> = {}>(args?: Subset<T, Author$booksArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$BookPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1996,6 +1999,7 @@ export namespace Prisma {
     bookId: number | null
     name: string | null
     type: $Enums.BookType | null
+    publishers: string | null
     createAt: Date | null
     updateAt: Date | null
     count: number | null
@@ -2006,6 +2010,7 @@ export namespace Prisma {
     bookId: number | null
     name: string | null
     type: $Enums.BookType | null
+    publishers: string | null
     createAt: Date | null
     updateAt: Date | null
     count: number | null
@@ -2016,6 +2021,7 @@ export namespace Prisma {
     bookId: number
     name: number
     type: number
+    publishers: number
     createAt: number
     updateAt: number
     count: number
@@ -2040,6 +2046,7 @@ export namespace Prisma {
     bookId?: true
     name?: true
     type?: true
+    publishers?: true
     createAt?: true
     updateAt?: true
     count?: true
@@ -2050,6 +2057,7 @@ export namespace Prisma {
     bookId?: true
     name?: true
     type?: true
+    publishers?: true
     createAt?: true
     updateAt?: true
     count?: true
@@ -2060,6 +2068,7 @@ export namespace Prisma {
     bookId?: true
     name?: true
     type?: true
+    publishers?: true
     createAt?: true
     updateAt?: true
     count?: true
@@ -2157,6 +2166,7 @@ export namespace Prisma {
     bookId: number
     name: string
     type: $Enums.BookType
+    publishers: string | null
     createAt: Date
     updateAt: Date
     count: number
@@ -2186,6 +2196,7 @@ export namespace Prisma {
     bookId?: boolean
     name?: boolean
     type?: boolean
+    publishers?: boolean
     createAt?: boolean
     updateAt?: boolean
     count?: boolean
@@ -2199,13 +2210,14 @@ export namespace Prisma {
     bookId?: boolean
     name?: boolean
     type?: boolean
+    publishers?: boolean
     createAt?: boolean
     updateAt?: boolean
     count?: boolean
     authorId?: boolean
   }
 
-  export type BookOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"bookId" | "name" | "type" | "createAt" | "updateAt" | "count" | "authorId", ExtArgs["result"]["book"]>
+  export type BookOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"bookId" | "name" | "type" | "publishers" | "createAt" | "updateAt" | "count" | "authorId", ExtArgs["result"]["book"]>
   export type BookInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     author?: boolean | AuthorDefaultArgs<ExtArgs>
   }
@@ -2219,6 +2231,7 @@ export namespace Prisma {
       bookId: number
       name: string
       type: $Enums.BookType
+      publishers: string | null
       createAt: Date
       updateAt: Date
       count: number
@@ -2234,7 +2247,7 @@ export namespace Prisma {
       select?: BookCountAggregateInputType | true
     }
 
-  export interface BookDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, ClientOptions = {}> {
+  export interface BookDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
     [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['Book'], meta: { name: 'Book' } }
     /**
      * Find zero or one Book that matches the filter.
@@ -2247,7 +2260,7 @@ export namespace Prisma {
      *   }
      * })
      */
-    findUnique<T extends BookFindUniqueArgs>(args: SelectSubset<T, BookFindUniqueArgs<ExtArgs>>): Prisma__BookClient<$Result.GetResult<Prisma.$BookPayload<ExtArgs>, T, "findUnique", ClientOptions> | null, null, ExtArgs, ClientOptions>
+    findUnique<T extends BookFindUniqueArgs>(args: SelectSubset<T, BookFindUniqueArgs<ExtArgs>>): Prisma__BookClient<$Result.GetResult<Prisma.$BookPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
 
     /**
      * Find one Book that matches the filter or throw an error with `error.code='P2025'`
@@ -2261,7 +2274,7 @@ export namespace Prisma {
      *   }
      * })
      */
-    findUniqueOrThrow<T extends BookFindUniqueOrThrowArgs>(args: SelectSubset<T, BookFindUniqueOrThrowArgs<ExtArgs>>): Prisma__BookClient<$Result.GetResult<Prisma.$BookPayload<ExtArgs>, T, "findUniqueOrThrow", ClientOptions>, never, ExtArgs, ClientOptions>
+    findUniqueOrThrow<T extends BookFindUniqueOrThrowArgs>(args: SelectSubset<T, BookFindUniqueOrThrowArgs<ExtArgs>>): Prisma__BookClient<$Result.GetResult<Prisma.$BookPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
     /**
      * Find the first Book that matches the filter.
@@ -2276,7 +2289,7 @@ export namespace Prisma {
      *   }
      * })
      */
-    findFirst<T extends BookFindFirstArgs>(args?: SelectSubset<T, BookFindFirstArgs<ExtArgs>>): Prisma__BookClient<$Result.GetResult<Prisma.$BookPayload<ExtArgs>, T, "findFirst", ClientOptions> | null, null, ExtArgs, ClientOptions>
+    findFirst<T extends BookFindFirstArgs>(args?: SelectSubset<T, BookFindFirstArgs<ExtArgs>>): Prisma__BookClient<$Result.GetResult<Prisma.$BookPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
 
     /**
      * Find the first Book that matches the filter or
@@ -2292,7 +2305,7 @@ export namespace Prisma {
      *   }
      * })
      */
-    findFirstOrThrow<T extends BookFindFirstOrThrowArgs>(args?: SelectSubset<T, BookFindFirstOrThrowArgs<ExtArgs>>): Prisma__BookClient<$Result.GetResult<Prisma.$BookPayload<ExtArgs>, T, "findFirstOrThrow", ClientOptions>, never, ExtArgs, ClientOptions>
+    findFirstOrThrow<T extends BookFindFirstOrThrowArgs>(args?: SelectSubset<T, BookFindFirstOrThrowArgs<ExtArgs>>): Prisma__BookClient<$Result.GetResult<Prisma.$BookPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
     /**
      * Find zero or more Books that matches the filter.
@@ -2310,7 +2323,7 @@ export namespace Prisma {
      * const bookWithBookIdOnly = await prisma.book.findMany({ select: { bookId: true } })
      * 
      */
-    findMany<T extends BookFindManyArgs>(args?: SelectSubset<T, BookFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$BookPayload<ExtArgs>, T, "findMany", ClientOptions>>
+    findMany<T extends BookFindManyArgs>(args?: SelectSubset<T, BookFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$BookPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
 
     /**
      * Create a Book.
@@ -2324,7 +2337,7 @@ export namespace Prisma {
      * })
      * 
      */
-    create<T extends BookCreateArgs>(args: SelectSubset<T, BookCreateArgs<ExtArgs>>): Prisma__BookClient<$Result.GetResult<Prisma.$BookPayload<ExtArgs>, T, "create", ClientOptions>, never, ExtArgs, ClientOptions>
+    create<T extends BookCreateArgs>(args: SelectSubset<T, BookCreateArgs<ExtArgs>>): Prisma__BookClient<$Result.GetResult<Prisma.$BookPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
     /**
      * Create many Books.
@@ -2352,7 +2365,7 @@ export namespace Prisma {
      * })
      * 
      */
-    delete<T extends BookDeleteArgs>(args: SelectSubset<T, BookDeleteArgs<ExtArgs>>): Prisma__BookClient<$Result.GetResult<Prisma.$BookPayload<ExtArgs>, T, "delete", ClientOptions>, never, ExtArgs, ClientOptions>
+    delete<T extends BookDeleteArgs>(args: SelectSubset<T, BookDeleteArgs<ExtArgs>>): Prisma__BookClient<$Result.GetResult<Prisma.$BookPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
     /**
      * Update one Book.
@@ -2369,7 +2382,7 @@ export namespace Prisma {
      * })
      * 
      */
-    update<T extends BookUpdateArgs>(args: SelectSubset<T, BookUpdateArgs<ExtArgs>>): Prisma__BookClient<$Result.GetResult<Prisma.$BookPayload<ExtArgs>, T, "update", ClientOptions>, never, ExtArgs, ClientOptions>
+    update<T extends BookUpdateArgs>(args: SelectSubset<T, BookUpdateArgs<ExtArgs>>): Prisma__BookClient<$Result.GetResult<Prisma.$BookPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
     /**
      * Delete zero or more Books.
@@ -2421,7 +2434,7 @@ export namespace Prisma {
      *   }
      * })
      */
-    upsert<T extends BookUpsertArgs>(args: SelectSubset<T, BookUpsertArgs<ExtArgs>>): Prisma__BookClient<$Result.GetResult<Prisma.$BookPayload<ExtArgs>, T, "upsert", ClientOptions>, never, ExtArgs, ClientOptions>
+    upsert<T extends BookUpsertArgs>(args: SelectSubset<T, BookUpsertArgs<ExtArgs>>): Prisma__BookClient<$Result.GetResult<Prisma.$BookPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
 
     /**
@@ -2561,9 +2574,9 @@ export namespace Prisma {
    * Because we want to prevent naming conflicts as mentioned in
    * https://github.com/prisma/prisma-client-js/issues/707
    */
-  export interface Prisma__BookClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, ClientOptions = {}> extends Prisma.PrismaPromise<T> {
+  export interface Prisma__BookClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
-    author<T extends AuthorDefaultArgs<ExtArgs> = {}>(args?: Subset<T, AuthorDefaultArgs<ExtArgs>>): Prisma__AuthorClient<$Result.GetResult<Prisma.$AuthorPayload<ExtArgs>, T, "findUniqueOrThrow", ClientOptions> | Null, Null, ExtArgs, ClientOptions>
+    author<T extends AuthorDefaultArgs<ExtArgs> = {}>(args?: Subset<T, AuthorDefaultArgs<ExtArgs>>): Prisma__AuthorClient<$Result.GetResult<Prisma.$AuthorPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2596,6 +2609,7 @@ export namespace Prisma {
     readonly bookId: FieldRef<"Book", 'Int'>
     readonly name: FieldRef<"Book", 'String'>
     readonly type: FieldRef<"Book", 'BookType'>
+    readonly publishers: FieldRef<"Book", 'String'>
     readonly createAt: FieldRef<"Book", 'DateTime'>
     readonly updateAt: FieldRef<"Book", 'DateTime'>
     readonly count: FieldRef<"Book", 'Int'>
@@ -2989,6 +3003,7 @@ export namespace Prisma {
     bookId: 'bookId',
     name: 'name',
     type: 'type',
+    publishers: 'publishers',
     createAt: 'createAt',
     updateAt: 'updateAt',
     count: 'count',
@@ -3013,8 +3028,17 @@ export namespace Prisma {
   export type AuthorOrderByRelevanceFieldEnum = (typeof AuthorOrderByRelevanceFieldEnum)[keyof typeof AuthorOrderByRelevanceFieldEnum]
 
 
+  export const NullsOrder: {
+    first: 'first',
+    last: 'last'
+  };
+
+  export type NullsOrder = (typeof NullsOrder)[keyof typeof NullsOrder]
+
+
   export const BookOrderByRelevanceFieldEnum: {
-    name: 'name'
+    name: 'name',
+    publishers: 'publishers'
   };
 
   export type BookOrderByRelevanceFieldEnum = (typeof BookOrderByRelevanceFieldEnum)[keyof typeof BookOrderByRelevanceFieldEnum]
@@ -3123,6 +3147,7 @@ export namespace Prisma {
     bookId?: IntFilter<"Book"> | number
     name?: StringFilter<"Book"> | string
     type?: EnumBookTypeFilter<"Book"> | $Enums.BookType
+    publishers?: StringNullableFilter<"Book"> | string | null
     createAt?: DateTimeFilter<"Book"> | Date | string
     updateAt?: DateTimeFilter<"Book"> | Date | string
     count?: IntFilter<"Book"> | number
@@ -3134,6 +3159,7 @@ export namespace Prisma {
     bookId?: SortOrder
     name?: SortOrder
     type?: SortOrder
+    publishers?: SortOrderInput | SortOrder
     createAt?: SortOrder
     updateAt?: SortOrder
     count?: SortOrder
@@ -3149,6 +3175,7 @@ export namespace Prisma {
     NOT?: BookWhereInput | BookWhereInput[]
     name?: StringFilter<"Book"> | string
     type?: EnumBookTypeFilter<"Book"> | $Enums.BookType
+    publishers?: StringNullableFilter<"Book"> | string | null
     createAt?: DateTimeFilter<"Book"> | Date | string
     updateAt?: DateTimeFilter<"Book"> | Date | string
     count?: IntFilter<"Book"> | number
@@ -3160,6 +3187,7 @@ export namespace Prisma {
     bookId?: SortOrder
     name?: SortOrder
     type?: SortOrder
+    publishers?: SortOrderInput | SortOrder
     createAt?: SortOrder
     updateAt?: SortOrder
     count?: SortOrder
@@ -3178,6 +3206,7 @@ export namespace Prisma {
     bookId?: IntWithAggregatesFilter<"Book"> | number
     name?: StringWithAggregatesFilter<"Book"> | string
     type?: EnumBookTypeWithAggregatesFilter<"Book"> | $Enums.BookType
+    publishers?: StringNullableWithAggregatesFilter<"Book"> | string | null
     createAt?: DateTimeWithAggregatesFilter<"Book"> | Date | string
     updateAt?: DateTimeWithAggregatesFilter<"Book"> | Date | string
     count?: IntWithAggregatesFilter<"Book"> | number
@@ -3237,6 +3266,7 @@ export namespace Prisma {
   export type BookCreateInput = {
     name: string
     type: $Enums.BookType
+    publishers?: string | null
     createAt?: Date | string
     updateAt?: Date | string
     count?: number
@@ -3247,6 +3277,7 @@ export namespace Prisma {
     bookId?: number
     name: string
     type: $Enums.BookType
+    publishers?: string | null
     createAt?: Date | string
     updateAt?: Date | string
     count?: number
@@ -3256,6 +3287,7 @@ export namespace Prisma {
   export type BookUpdateInput = {
     name?: StringFieldUpdateOperationsInput | string
     type?: EnumBookTypeFieldUpdateOperationsInput | $Enums.BookType
+    publishers?: NullableStringFieldUpdateOperationsInput | string | null
     createAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updateAt?: DateTimeFieldUpdateOperationsInput | Date | string
     count?: IntFieldUpdateOperationsInput | number
@@ -3266,6 +3298,7 @@ export namespace Prisma {
     bookId?: IntFieldUpdateOperationsInput | number
     name?: StringFieldUpdateOperationsInput | string
     type?: EnumBookTypeFieldUpdateOperationsInput | $Enums.BookType
+    publishers?: NullableStringFieldUpdateOperationsInput | string | null
     createAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updateAt?: DateTimeFieldUpdateOperationsInput | Date | string
     count?: IntFieldUpdateOperationsInput | number
@@ -3276,6 +3309,7 @@ export namespace Prisma {
     bookId?: number
     name: string
     type: $Enums.BookType
+    publishers?: string | null
     createAt?: Date | string
     updateAt?: Date | string
     count?: number
@@ -3285,6 +3319,7 @@ export namespace Prisma {
   export type BookUpdateManyMutationInput = {
     name?: StringFieldUpdateOperationsInput | string
     type?: EnumBookTypeFieldUpdateOperationsInput | $Enums.BookType
+    publishers?: NullableStringFieldUpdateOperationsInput | string | null
     createAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updateAt?: DateTimeFieldUpdateOperationsInput | Date | string
     count?: IntFieldUpdateOperationsInput | number
@@ -3294,6 +3329,7 @@ export namespace Prisma {
     bookId?: IntFieldUpdateOperationsInput | number
     name?: StringFieldUpdateOperationsInput | string
     type?: EnumBookTypeFieldUpdateOperationsInput | $Enums.BookType
+    publishers?: NullableStringFieldUpdateOperationsInput | string | null
     createAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updateAt?: DateTimeFieldUpdateOperationsInput | Date | string
     count?: IntFieldUpdateOperationsInput | number
@@ -3437,9 +3473,29 @@ export namespace Prisma {
     not?: NestedEnumBookTypeFilter<$PrismaModel> | $Enums.BookType
   }
 
+  export type StringNullableFilter<$PrismaModel = never> = {
+    equals?: string | StringFieldRefInput<$PrismaModel> | null
+    in?: string[] | null
+    notIn?: string[] | null
+    lt?: string | StringFieldRefInput<$PrismaModel>
+    lte?: string | StringFieldRefInput<$PrismaModel>
+    gt?: string | StringFieldRefInput<$PrismaModel>
+    gte?: string | StringFieldRefInput<$PrismaModel>
+    contains?: string | StringFieldRefInput<$PrismaModel>
+    startsWith?: string | StringFieldRefInput<$PrismaModel>
+    endsWith?: string | StringFieldRefInput<$PrismaModel>
+    search?: string
+    not?: NestedStringNullableFilter<$PrismaModel> | string | null
+  }
+
   export type AuthorScalarRelationFilter = {
     is?: AuthorWhereInput
     isNot?: AuthorWhereInput
+  }
+
+  export type SortOrderInput = {
+    sort: SortOrder
+    nulls?: NullsOrder
   }
 
   export type BookOrderByRelevanceInput = {
@@ -3452,6 +3508,7 @@ export namespace Prisma {
     bookId?: SortOrder
     name?: SortOrder
     type?: SortOrder
+    publishers?: SortOrder
     createAt?: SortOrder
     updateAt?: SortOrder
     count?: SortOrder
@@ -3468,6 +3525,7 @@ export namespace Prisma {
     bookId?: SortOrder
     name?: SortOrder
     type?: SortOrder
+    publishers?: SortOrder
     createAt?: SortOrder
     updateAt?: SortOrder
     count?: SortOrder
@@ -3478,6 +3536,7 @@ export namespace Prisma {
     bookId?: SortOrder
     name?: SortOrder
     type?: SortOrder
+    publishers?: SortOrder
     createAt?: SortOrder
     updateAt?: SortOrder
     count?: SortOrder
@@ -3498,6 +3557,24 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedEnumBookTypeFilter<$PrismaModel>
     _max?: NestedEnumBookTypeFilter<$PrismaModel>
+  }
+
+  export type StringNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: string | StringFieldRefInput<$PrismaModel> | null
+    in?: string[] | null
+    notIn?: string[] | null
+    lt?: string | StringFieldRefInput<$PrismaModel>
+    lte?: string | StringFieldRefInput<$PrismaModel>
+    gt?: string | StringFieldRefInput<$PrismaModel>
+    gte?: string | StringFieldRefInput<$PrismaModel>
+    contains?: string | StringFieldRefInput<$PrismaModel>
+    startsWith?: string | StringFieldRefInput<$PrismaModel>
+    endsWith?: string | StringFieldRefInput<$PrismaModel>
+    search?: string
+    not?: NestedStringNullableWithAggregatesFilter<$PrismaModel> | string | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedStringNullableFilter<$PrismaModel>
+    _max?: NestedStringNullableFilter<$PrismaModel>
   }
 
   export type BookCreateNestedManyWithoutAuthorInput = {
@@ -3566,6 +3643,10 @@ export namespace Prisma {
 
   export type EnumBookTypeFieldUpdateOperationsInput = {
     set?: $Enums.BookType
+  }
+
+  export type NullableStringFieldUpdateOperationsInput = {
+    set?: string | null
   }
 
   export type AuthorUpdateOneRequiredWithoutBooksNestedInput = {
@@ -3679,6 +3760,21 @@ export namespace Prisma {
     not?: NestedEnumBookTypeFilter<$PrismaModel> | $Enums.BookType
   }
 
+  export type NestedStringNullableFilter<$PrismaModel = never> = {
+    equals?: string | StringFieldRefInput<$PrismaModel> | null
+    in?: string[] | null
+    notIn?: string[] | null
+    lt?: string | StringFieldRefInput<$PrismaModel>
+    lte?: string | StringFieldRefInput<$PrismaModel>
+    gt?: string | StringFieldRefInput<$PrismaModel>
+    gte?: string | StringFieldRefInput<$PrismaModel>
+    contains?: string | StringFieldRefInput<$PrismaModel>
+    startsWith?: string | StringFieldRefInput<$PrismaModel>
+    endsWith?: string | StringFieldRefInput<$PrismaModel>
+    search?: string
+    not?: NestedStringNullableFilter<$PrismaModel> | string | null
+  }
+
   export type NestedEnumBookTypeWithAggregatesFilter<$PrismaModel = never> = {
     equals?: $Enums.BookType | EnumBookTypeFieldRefInput<$PrismaModel>
     in?: $Enums.BookType[]
@@ -3689,9 +3785,39 @@ export namespace Prisma {
     _max?: NestedEnumBookTypeFilter<$PrismaModel>
   }
 
+  export type NestedStringNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: string | StringFieldRefInput<$PrismaModel> | null
+    in?: string[] | null
+    notIn?: string[] | null
+    lt?: string | StringFieldRefInput<$PrismaModel>
+    lte?: string | StringFieldRefInput<$PrismaModel>
+    gt?: string | StringFieldRefInput<$PrismaModel>
+    gte?: string | StringFieldRefInput<$PrismaModel>
+    contains?: string | StringFieldRefInput<$PrismaModel>
+    startsWith?: string | StringFieldRefInput<$PrismaModel>
+    endsWith?: string | StringFieldRefInput<$PrismaModel>
+    search?: string
+    not?: NestedStringNullableWithAggregatesFilter<$PrismaModel> | string | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedStringNullableFilter<$PrismaModel>
+    _max?: NestedStringNullableFilter<$PrismaModel>
+  }
+
+  export type NestedIntNullableFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel> | null
+    in?: number[] | null
+    notIn?: number[] | null
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntNullableFilter<$PrismaModel> | number | null
+  }
+
   export type BookCreateWithoutAuthorInput = {
     name: string
     type: $Enums.BookType
+    publishers?: string | null
     createAt?: Date | string
     updateAt?: Date | string
     count?: number
@@ -3701,6 +3827,7 @@ export namespace Prisma {
     bookId?: number
     name: string
     type: $Enums.BookType
+    publishers?: string | null
     createAt?: Date | string
     updateAt?: Date | string
     count?: number
@@ -3739,6 +3866,7 @@ export namespace Prisma {
     bookId?: IntFilter<"Book"> | number
     name?: StringFilter<"Book"> | string
     type?: EnumBookTypeFilter<"Book"> | $Enums.BookType
+    publishers?: StringNullableFilter<"Book"> | string | null
     createAt?: DateTimeFilter<"Book"> | Date | string
     updateAt?: DateTimeFilter<"Book"> | Date | string
     count?: IntFilter<"Book"> | number
@@ -3791,6 +3919,7 @@ export namespace Prisma {
     bookId?: number
     name: string
     type: $Enums.BookType
+    publishers?: string | null
     createAt?: Date | string
     updateAt?: Date | string
     count?: number
@@ -3799,6 +3928,7 @@ export namespace Prisma {
   export type BookUpdateWithoutAuthorInput = {
     name?: StringFieldUpdateOperationsInput | string
     type?: EnumBookTypeFieldUpdateOperationsInput | $Enums.BookType
+    publishers?: NullableStringFieldUpdateOperationsInput | string | null
     createAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updateAt?: DateTimeFieldUpdateOperationsInput | Date | string
     count?: IntFieldUpdateOperationsInput | number
@@ -3808,6 +3938,7 @@ export namespace Prisma {
     bookId?: IntFieldUpdateOperationsInput | number
     name?: StringFieldUpdateOperationsInput | string
     type?: EnumBookTypeFieldUpdateOperationsInput | $Enums.BookType
+    publishers?: NullableStringFieldUpdateOperationsInput | string | null
     createAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updateAt?: DateTimeFieldUpdateOperationsInput | Date | string
     count?: IntFieldUpdateOperationsInput | number
@@ -3817,6 +3948,7 @@ export namespace Prisma {
     bookId?: IntFieldUpdateOperationsInput | number
     name?: StringFieldUpdateOperationsInput | string
     type?: EnumBookTypeFieldUpdateOperationsInput | $Enums.BookType
+    publishers?: NullableStringFieldUpdateOperationsInput | string | null
     createAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updateAt?: DateTimeFieldUpdateOperationsInput | Date | string
     count?: IntFieldUpdateOperationsInput | number

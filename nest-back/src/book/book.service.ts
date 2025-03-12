@@ -6,15 +6,21 @@ import { ICreateBook } from './interface/book.interface';
 @Injectable()
 export class BookService {
   constructor(private prisma: PrismaService) {}
-  
-  async createBook({ name, type, authorId, count }: ICreateBook) {
+
+  async createBook({ name, type, authorId, count, publishers }: ICreateBook) {
     return this.prisma.book.create({
-      data: { name, type, authorId, count },
+      data: { name, type, authorId, count, publishers },
     });
   }
 
   async getBook() {
-    return this.prisma.book.findMany();
+    const books = await this.prisma.book.findMany({
+      include: { author: true },
+    });
+    return books.map((book) => ({
+      ...book,
+      typeName: `${book.type} - ${book.name}`, // ✅ Add typeName dynamically
+    }));
   }
 
   findOne(id: number) {
@@ -27,6 +33,7 @@ export class BookService {
 
   async deleteBookById(id: number) {
     return this.prisma.book.delete({
-      where: { bookId: id },  });
+      where: { bookId: id },
+    });
   }
 }
